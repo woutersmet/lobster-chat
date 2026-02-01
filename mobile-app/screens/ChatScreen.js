@@ -7,9 +7,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import ChatService from "../services/ChatService";
 import ChatInput from "../components/ChatInput";
+import SettingsService from "../services/SettingsService";
 
 export default function ChatScreen({ route, navigation }) {
   const conversationId = route.params?.conversationId || "default";
@@ -21,6 +23,15 @@ export default function ChatScreen({ route, navigation }) {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [isLocalMode, setIsLocalMode] = useState(SettingsService.isLocalMode());
+
+  // Subscribe to settings changes
+  useEffect(() => {
+    const unsubscribe = SettingsService.subscribe(() => {
+      setIsLocalMode(SettingsService.isLocalMode());
+    });
+    return unsubscribe;
+  }, []);
 
   // Update the header title and load messages when conversation changes
   useEffect(() => {
@@ -140,6 +151,18 @@ export default function ChatScreen({ route, navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
+      {isLocalMode && (
+        <TouchableOpacity
+          style={styles.localModeNotice}
+          onPress={() => navigation.navigate('Settings')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.localModeText}>
+            ⚠️ Local Simulation Mode
+          </Text>
+        </TouchableOpacity>
+      )}
+
       <FlatList
         data={messages}
         renderItem={renderMessage}
@@ -165,6 +188,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  localModeNotice: {
+    backgroundColor: "#FFF9C4", // Light yellow
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#F9A825", // Darker yellow border
+  },
+  localModeText: {
+    fontSize: 13,
+    color: "#F57F17", // Dark yellow/orange text
+    fontWeight: "600",
+    textAlign: "center",
   },
   messageList: {
     padding: 16,
