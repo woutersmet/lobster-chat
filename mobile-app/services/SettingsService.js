@@ -3,6 +3,7 @@ let userSettings = {
   firstName: "Wouter",
   lastName: "Smet",
   serverUrl: "", // Default empty, user needs to configure
+  serverMode: "local", // 'local' or 'server'
 };
 
 // Listeners for settings changes
@@ -70,6 +71,27 @@ class SettingsService {
   static setLocalWifiUrl() {
     userSettings.serverUrl = "http://192.168.1.23:3000";
     this.notifyListeners();
+  }
+
+  // Get server mode
+  static getServerMode() {
+    return userSettings.serverMode;
+  }
+
+  // Set server mode
+  static setServerMode(mode) {
+    userSettings.serverMode = mode; // 'local' or 'server'
+    this.notifyListeners();
+  }
+
+  // Check if in local mode
+  static isLocalMode() {
+    return userSettings.serverMode === "local";
+  }
+
+  // Check if in server mode
+  static isServerMode() {
+    return userSettings.serverMode === "server";
   }
 
   // Subscribe to settings changes

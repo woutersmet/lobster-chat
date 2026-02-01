@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Image } from "react-native";
+import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Image, RefreshControl } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SettingsService from "../services/SettingsService";
+import ApiService from "../services/ApiService";
 import ChatInput from "../components/ChatInput";
 
 // Premade messages
@@ -23,15 +24,39 @@ const PREMADE_MESSAGES = [
 export default function HomeScreen() {
   const [userFirstName, setUserFirstName] = useState(SettingsService.getFirstName());
   const [inputText, setInputText] = useState("");
+  const [serverMode, setServerMode] = useState(SettingsService.getServerMode());
+  const [healthStatus, setHealthStatus] = useState(null); // null, 'online', 'offline'
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
   // Subscribe to settings changes
   useEffect(() => {
     const unsubscribe = SettingsService.subscribe(() => {
       setUserFirstName(SettingsService.getFirstName());
+      setServerMode(SettingsService.getServerMode());
     });
     return unsubscribe;
   }, []);
+
+  // Check health on mount if in server mode
+  useEffect(() => {
+    if (serverMode === 'server') {
+      checkHealth();
+    }
+  }, [serverMode]);
+
+  const checkHealth = async () => {
+    if (serverMode === 'server') {
+      const result = await ApiService.checkHealth();
+      setHealthStatus(result.success ? 'online' : 'offline');
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await checkHealth();
+    setRefreshing(false);
+  };
 
   const handleSend = () => {
     // Navigate to a new chat with the message
@@ -53,7 +78,12 @@ export default function HomeScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.content}>
           <Image
             source={require("../assets/mobile_app_lobster.png")}
@@ -62,6 +92,29 @@ export default function HomeScreen() {
           />
           <Text style={styles.welcomeText}>Welcome, {userFirstName}</Text>
           <Text style={styles.subtitle}>How can I help you today?</Text>
+
+          {/* Server Status - Tappable */}
+          <TouchableOpacity
+            style={styles.serverStatus}
+            onPress={() => navigation.navigate('Settings')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.serverStatusLabel}>Server Status: </Text>
+            <Text style={styles.serverStatusMode}>
+              {serverMode === 'local' ? 'Local Simulation' : 'Server'}
+            </Text>
+            {serverMode === 'server' && healthStatus && (
+              <>
+                <View style={[
+                  styles.statusDot,
+                  healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
+                ]} />
+                <Text style={styles.serverStatusText}>
+                  {healthStatus === 'online' ? 'Online' : 'Offline'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.premadeContainer}>
@@ -136,6 +189,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     fontWeight: "400",
+  },
+  serverStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+  },
+  serverStatusLabel: {
+    fontSize: 12,
+    color: "#666",
+    fontWeight: "500",
+  },
+  serverStatusMode: {
+    fontSize: 12,
+    color: "#333",
+    fontWeight: "600",
+  },
+  serverStatusText: {
+    fontSize: 12,
+    color: "#333",
+    marginLeft: 4,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  statusOnline: {
+    backgroundColor: "#4CAF50",
+  },
+  statusOffline: {
+    backgroundColor: "#F44336",
   },
 });
 

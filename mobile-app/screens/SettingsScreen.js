@@ -14,12 +14,14 @@ export default function SettingsScreen() {
   const [firstName, setFirstName] = useState(SettingsService.getFirstName());
   const [lastName, setLastName] = useState(SettingsService.getLastName());
   const [serverUrl, setServerUrl] = useState(SettingsService.getServerUrl());
+  const [serverMode, setServerMode] = useState(SettingsService.getServerMode());
   const [healthStatus, setHealthStatus] = useState(null); // null, 'online', 'offline'
   const [isCheckingHealth, setIsCheckingHealth] = useState(false);
 
   const handleSave = () => {
     SettingsService.setNames(firstName, lastName);
     SettingsService.setServerUrl(serverUrl);
+    SettingsService.setServerMode(serverMode);
   };
 
   const handleLocalWifi = () => {
@@ -42,8 +44,6 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-
       {/* Profile Settings Section */}
       <Text style={styles.sectionTitle}>Profile</Text>
 
@@ -69,49 +69,77 @@ export default function SettingsScreen() {
         />
       </View>
 
-      {/* Online Server Section */}
-      <Text style={styles.sectionTitle}>Online Server</Text>
+      {/* Server Settings Section */}
+      <Text style={styles.sectionTitle}>Server Settings</Text>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Server URL</Text>
-        <TextInput
-          style={styles.input}
-          value={serverUrl}
-          onChangeText={setServerUrl}
-          placeholder="http://192.168.1.23:3000"
-          placeholderTextColor="#999"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
-
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleLocalWifi}>
-          <Text style={styles.secondaryButtonText}>Use Local WiFi</Text>
+      {/* Mode Selection Radio Buttons */}
+      <View style={styles.radioGroup}>
+        <TouchableOpacity
+          style={styles.radioOption}
+          onPress={() => setServerMode('local')}
+        >
+          <View style={styles.radioCircle}>
+            {serverMode === 'local' && <View style={styles.radioSelected} />}
+          </View>
+          <Text style={styles.radioLabel}>Local Simulation</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.secondaryButton, styles.healthButton]}
-          onPress={handleCheckHealth}
-          disabled={isCheckingHealth}
+          style={styles.radioOption}
+          onPress={() => setServerMode('server')}
         >
-          {isCheckingHealth ? (
-            <ActivityIndicator size="small" color="#000" />
-          ) : (
-            <>
-              {healthStatus && (
-                <View style={[
-                  styles.statusDot,
-                  healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
-                ]} />
-              )}
-              <Text style={styles.secondaryButtonText}>
-                {healthStatus === 'online' ? 'Online' : healthStatus === 'offline' ? 'Offline' : 'Check Health'}
-              </Text>
-            </>
-          )}
+          <View style={styles.radioCircle}>
+            {serverMode === 'server' && <View style={styles.radioSelected} />}
+          </View>
+          <Text style={styles.radioLabel}>Server</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Show server settings only in server mode */}
+      {serverMode === 'server' && (
+        <>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Server URL</Text>
+            <TextInput
+              style={styles.input}
+              value={serverUrl}
+              onChangeText={setServerUrl}
+              placeholder="http://192.168.1.23:3000"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleLocalWifi}>
+              <Text style={styles.secondaryButtonText}>Use Local WiFi</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondaryButton, styles.healthButton]}
+              onPress={handleCheckHealth}
+              disabled={isCheckingHealth}
+            >
+              {isCheckingHealth ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : (
+                <>
+                  {healthStatus && (
+                    <View style={[
+                      styles.statusDot,
+                      healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
+                    ]} />
+                  )}
+                  <Text style={styles.secondaryButtonText}>
+                    {healthStatus === 'online' ? 'Online' : healthStatus === 'offline' ? 'Offline' : 'Check Health'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -199,6 +227,34 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  radioGroup: {
+    marginBottom: 24,
+  },
+  radioOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  radioSelected: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#000",
+  },
+  radioLabel: {
+    fontSize: 16,
+    color: "#333",
   },
 });
 
