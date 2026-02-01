@@ -9,22 +9,26 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import ChatService from "../services/ChatService";
 
 export default function ChatScreen({ route, navigation }) {
   const conversationId = route.params?.conversationId || "default";
   const conversationTitle = route.params?.title || "Chat";
 
-  // Update the header title when conversation changes
+  // Load messages from ChatService based on conversationId
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
+
+  // Update the header title and load messages when conversation changes
   useEffect(() => {
     navigation.setOptions({
       title: conversationTitle,
     });
-  }, [conversationTitle, navigation]);
-  const [messages, setMessages] = useState([
-    { id: "1", text: "Hello! How can I help you?", sender: "bot" },
-    { id: "2", text: "Hi there!", sender: "user" },
-  ]);
-  const [inputText, setInputText] = useState("");
+
+    // Load messages for this conversation
+    const loadedMessages = ChatService.getMessages(conversationId);
+    setMessages(loadedMessages);
+  }, [conversationId, conversationTitle, navigation]);
 
   const sendMessage = () => {
     if (inputText.trim() === "") return;
@@ -90,7 +94,7 @@ export default function ChatScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
   },
   messageList: {
     padding: 16,
@@ -104,22 +108,22 @@ const styles = StyleSheet.create({
   },
   userBubble: {
     alignSelf: "flex-end",
-    backgroundColor: "#007AFF",
+    backgroundColor: "#f0f0f0",
   },
   botBubble: {
     alignSelf: "flex-start",
-    backgroundColor: "#E5E5EA",
   },
   messageText: {
     fontSize: 16,
     color: "#000",
   },
   userText: {
-    color: "#fff",
+    color: "#000",
   },
   inputContainer: {
     flexDirection: "row",
     padding: 12,
+    paddingBottom: 32,
     backgroundColor: "#fff",
     borderTopWidth: 1,
     borderTopColor: "#ddd",
@@ -136,7 +140,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   sendButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#000",
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,

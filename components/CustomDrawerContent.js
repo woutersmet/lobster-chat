@@ -10,21 +10,20 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
+import ChatService from "../services/ChatService";
 
 export default function CustomDrawerContent(props) {
   const { navigation } = props;
 
-  // Sample conversation data
-  const conversations = [
-    { id: "1", title: "Project Discussion" },
-    { id: "2", title: "Team Meeting Notes" },
-    { id: "3", title: "Budget Planning" },
-    { id: "4", title: "Marketing Strategy" },
-    { id: "5", title: "Product Roadmap" },
-  ];
+  // Get conversations from ChatService
+  const conversations = ChatService.getAllSessions();
 
   const navigateToConversation = (conversationId, title) => {
     navigation.navigate("Chat", { conversationId, title });
+  };
+
+  const createNewChat = () => {
+    navigation.navigate("Chat", { conversationId: "new", title: "New Chat" });
   };
 
   return (
@@ -50,7 +49,12 @@ export default function CustomDrawerContent(props) {
 
       {/* Conversations Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>CONVERSATIONS</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>CONVERSATIONS</Text>
+          <TouchableOpacity style={styles.newChatButton} onPress={createNewChat}>
+            <Text style={styles.newChatButtonText}>+ New</Text>
+          </TouchableOpacity>
+        </View>
         {conversations.map((conversation) => (
           <TouchableOpacity
             key={conversation.id}
@@ -70,18 +74,34 @@ export default function CustomDrawerContent(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 60,
   },
   section: {
     paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    marginTop: 8,
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
     color: "#999",
-    marginBottom: 12,
-    marginTop: 8,
     letterSpacing: 0.5,
+  },
+  newChatButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    backgroundColor: "#000",
+    borderRadius: 12,
+  },
+  newChatButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#fff",
   },
   drawerItem: {
     paddingVertical: 12,
@@ -99,7 +119,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 4,
-    backgroundColor: "#f8f8f8",
   },
   conversationText: {
     fontSize: 15,

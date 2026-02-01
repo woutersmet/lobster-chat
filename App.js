@@ -18,6 +18,9 @@ export default function App() {
         <Drawer.Navigator
           initialRouteName="Home"
           drawerContent={(props) => <CustomDrawerContent {...props} />}
+          screenOptions={{
+            headerTintColor: "#000",
+          }}
         >
           <Drawer.Screen name="Home" component={HomeScreen} />
           <Drawer.Screen name="Chat" component={ChatScreen} />
