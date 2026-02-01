@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,16 @@ import {
   Platform,
 } from "react-native";
 
-export default function ChatScreen() {
+export default function ChatScreen({ route, navigation }) {
+  const conversationId = route.params?.conversationId || "default";
+  const conversationTitle = route.params?.title || "Chat";
+
+  // Update the header title when conversation changes
+  useEffect(() => {
+    navigation.setOptions({
+      title: conversationTitle,
+    });
+  }, [conversationTitle, navigation]);
   const [messages, setMessages] = useState([
     { id: "1", text: "Hello! How can I help you?", sender: "bot" },
     { id: "2", text: "Hi there!", sender: "user" },
