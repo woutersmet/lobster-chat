@@ -18,43 +18,78 @@ const getHomepage = (req, res) => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
           line-height: 1.6;
           color: #333;
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
+          background: white;
+          padding: 40px 20px;
         }
-        header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 20px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .wrapper {
+          max-width: 1000px;
+          margin: 0 auto;
         }
         h1 {
-          margin-bottom: 10px;
+          font-size: 24px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 8px;
         }
         .subtitle {
-          opacity: 0.9;
           font-size: 14px;
+          color: #666;
+          margin-bottom: 40px;
+        }
+        section {
+          margin-bottom: 50px;
+        }
+        h2 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 15px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #ddd;
         }
         .container {
-          flex: 1;
           display: flex;
-          overflow: hidden;
+          border: 1px solid #ddd;
+          height: 500px;
+        }
+        .api-endpoints {
+          list-style: none;
+        }
+        .endpoint {
+          margin: 8px 0;
+          font-family: 'Courier New', monospace;
+          color: #555;
+          font-size: 13px;
+        }
+        .method {
+          display: inline-block;
+          padding: 2px 6px;
+          border-radius: 2px;
+          font-weight: 600;
+          font-size: 11px;
+          margin-right: 8px;
+          background: #e5e5e5;
+          color: #333;
+          min-width: 45px;
+          text-align: center;
         }
         .sidebar {
-          width: 300px;
-          background: #f8f9fa;
-          border-right: 1px solid #dee2e6;
+          width: 250px;
+          background: #fafafa;
+          border-right: 1px solid #ddd;
           display: flex;
           flex-direction: column;
         }
         .sidebar-header {
           padding: 15px;
           background: white;
-          border-bottom: 1px solid #dee2e6;
+          border-bottom: 1px solid #ddd;
         }
-        .sidebar-header h2 {
-          font-size: 18px;
+        .sidebar-header h3 {
+          font-size: 14px;
+          font-weight: 600;
           margin-bottom: 10px;
+          color: #333;
         }
         .new-session-form {
           display: flex;
@@ -62,47 +97,48 @@ const getHomepage = (req, res) => {
         }
         .new-session-form input {
           flex: 1;
-          padding: 8px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          font-size: 14px;
+          padding: 6px 8px;
+          border: 1px solid #ccc;
+          border-radius: 2px;
+          font-size: 13px;
         }
         .new-session-form button {
-          padding: 8px 15px;
-          background: #667eea;
+          padding: 6px 12px;
+          background: #333;
           color: white;
           border: none;
-          border-radius: 4px;
+          border-radius: 2px;
           cursor: pointer;
-          font-size: 14px;
+          font-size: 13px;
         }
         .new-session-form button:hover {
-          background: #5568d3;
+          background: #555;
         }
         .sessions-list {
           flex: 1;
           overflow-y: auto;
         }
         .session-item {
-          padding: 15px;
-          border-bottom: 1px solid #dee2e6;
+          padding: 12px 15px;
+          border-bottom: 1px solid #e5e5e5;
           cursor: pointer;
-          transition: background 0.2s;
+          transition: background 0.15s;
         }
         .session-item:hover {
-          background: #e9ecef;
+          background: #f0f0f0;
         }
         .session-item.active {
-          background: #667eea;
-          color: white;
+          background: #e8e8e8;
         }
         .session-title {
           font-weight: 500;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
+          font-size: 13px;
+          color: #333;
         }
         .session-date {
-          font-size: 12px;
-          opacity: 0.7;
+          font-size: 11px;
+          color: #888;
         }
         .main-content {
           flex: 1;
@@ -113,152 +149,136 @@ const getHomepage = (req, res) => {
         .chat-header {
           padding: 15px 20px;
           background: white;
-          border-bottom: 1px solid #dee2e6;
+          border-bottom: 1px solid #ddd;
         }
-        .chat-header h2 {
-          font-size: 18px;
+        .chat-header h3 {
+          font-size: 14px;
+          font-weight: 600;
+          color: #333;
         }
         .messages-container {
           flex: 1;
           overflow-y: auto;
           padding: 20px;
-          background: #f8f9fa;
+          background: #fafafa;
         }
         .message {
-          margin-bottom: 15px;
-          padding: 12px 15px;
-          border-radius: 8px;
+          margin-bottom: 12px;
+          padding: 10px 12px;
+          border-radius: 3px;
           max-width: 70%;
         }
         .message.user {
-          background: #667eea;
+          background: #333;
           color: white;
           margin-left: auto;
         }
         .message.assistant {
           background: white;
-          border: 1px solid #dee2e6;
+          border: 1px solid #ddd;
+          color: #333;
         }
         .message-sender {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
-          margin-bottom: 4px;
-          opacity: 0.8;
+          margin-bottom: 3px;
+          opacity: 0.7;
         }
         .message-text {
           word-wrap: break-word;
+          font-size: 13px;
         }
         .message-time {
-          font-size: 11px;
-          margin-top: 4px;
-          opacity: 0.7;
+          font-size: 10px;
+          margin-top: 3px;
+          opacity: 0.6;
         }
         .input-container {
-          padding: 20px;
+          padding: 15px 20px;
           background: white;
-          border-top: 1px solid #dee2e6;
+          border-top: 1px solid #ddd;
         }
         .message-form {
           display: flex;
-          gap: 10px;
+          gap: 8px;
         }
         .message-form input {
           flex: 1;
-          padding: 12px;
-          border: 1px solid #ced4da;
-          border-radius: 8px;
-          font-size: 14px;
+          padding: 8px 10px;
+          border: 1px solid #ccc;
+          border-radius: 2px;
+          font-size: 13px;
         }
         .message-form button {
-          padding: 12px 24px;
-          background: #667eea;
+          padding: 8px 16px;
+          background: #333;
           color: white;
           border: none;
-          border-radius: 8px;
+          border-radius: 2px;
           cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 13px;
         }
         .message-form button:hover {
-          background: #5568d3;
+          background: #555;
         }
         .empty-state {
           display: flex;
           align-items: center;
           justify-content: center;
           height: 100%;
-          color: #6c757d;
-          font-size: 16px;
-        }
-        .api-docs {
-          padding: 20px;
-          background: #fff3cd;
-          border-top: 1px solid #ffc107;
+          color: #999;
           font-size: 13px;
         }
-        .api-docs h3 {
-          margin-bottom: 10px;
-          font-size: 14px;
-        }
-        .endpoint {
-          margin: 5px 0;
-          font-family: 'Courier New', monospace;
-        }
-        .method {
-          display: inline-block;
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-weight: bold;
-          font-size: 11px;
-          margin-right: 8px;
-        }
-        .get { background: #61affe; color: white; }
-        .post { background: #49cc90; color: white; }
       </style>
     </head>
     <body>
-      <header>
-        <h1>🚀 Drawer Hello API Server</h1>
-        <div class="subtitle">Backend API server for the Drawer Hello mobile application - Running on port ${PORT}</div>
-      </header>
+      <div class="wrapper">
+        <h1>You are online!</h1>
+        <p class="subtitle">This means the server is running on port ${PORT}</p>
 
-      <div class="container">
-        <div class="sidebar">
-          <div class="sidebar-header">
-            <h2>Sessions</h2>
-            <form class="new-session-form" id="newSessionForm">
-              <input type="text" id="sessionTitle" placeholder="New session title..." required>
-              <button type="submit">Create</button>
-            </form>
+        <section>
+          <h2>API Endpoints</h2>
+          <div class="api-endpoints">
+            <div class="endpoint"><span class="method">GET</span> /api/health - Health check</div>
+            <div class="endpoint"><span class="method">GET</span> /api/sessions - Get all sessions</div>
+            <div class="endpoint"><span class="method">POST</span> /api/sessions - Create session</div>
+            <div class="endpoint"><span class="method">GET</span> /api/sessions/:id/messages - Get messages</div>
+            <div class="endpoint"><span class="method">POST</span> /api/sessions/:id/messages - Add message</div>
           </div>
-          <div class="sessions-list" id="sessionsList">
-            <div class="empty-state">No sessions yet</div>
-          </div>
-        </div>
+        </section>
 
-        <div class="main-content">
-          <div class="chat-header">
-            <h2 id="chatTitle">Select a session</h2>
-          </div>
-          <div class="messages-container" id="messagesContainer">
-            <div class="empty-state">Select a session to view messages</div>
-          </div>
-          <div class="input-container">
-            <form class="message-form" id="messageForm">
-              <input type="text" id="messageText" placeholder="Type a message..." disabled>
-              <button type="submit" disabled>Send</button>
-            </form>
-          </div>
-        </div>
-      </div>
+        <section>
+          <h2>Chat Preview</h2>
+          <div class="container">
+            <div class="sidebar">
+              <div class="sidebar-header">
+                <h3>Sessions</h3>
+                <form class="new-session-form" id="newSessionForm">
+                  <input type="text" id="sessionTitle" placeholder="New session title..." required>
+                  <button type="submit">Create</button>
+                </form>
+              </div>
+              <div class="sessions-list" id="sessionsList">
+                <div class="empty-state">No sessions yet</div>
+              </div>
+            </div>
 
-      <div class="api-docs">
-        <h3>📋 API Endpoints</h3>
-        <div class="endpoint"><span class="method get">GET</span> /api/health - Health check</div>
-        <div class="endpoint"><span class="method get">GET</span> /api/sessions - Get all sessions</div>
-        <div class="endpoint"><span class="method post">POST</span> /api/sessions - Create session</div>
-        <div class="endpoint"><span class="method get">GET</span> /api/sessions/:id/messages - Get messages</div>
-        <div class="endpoint"><span class="method post">POST</span> /api/sessions/:id/messages - Add message</div>
+            <div class="main-content">
+              <div class="chat-header">
+                <h3 id="chatTitle">Select a session</h3>
+              </div>
+              <div class="messages-container" id="messagesContainer">
+                <div class="empty-state">Select a session to view messages</div>
+              </div>
+              <div class="input-container">
+                <form class="message-form" id="messageForm">
+                  <input type="text" id="messageText" placeholder="Type a message..." disabled>
+                  <button type="submit" disabled>Send</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       <script>
