@@ -14,6 +14,132 @@ let messages = {};
 let sessionIdCounter = 1;
 let messageIdCounter = 1;
 
+// Root endpoint - API documentation
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Drawer Hello API Server</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 20px;
+          line-height: 1.6;
+          color: #333;
+        }
+        h1 {
+          color: #2c3e50;
+          border-bottom: 3px solid #3498db;
+          padding-bottom: 10px;
+        }
+        h2 {
+          color: #34495e;
+          margin-top: 30px;
+        }
+        .endpoint {
+          background: #f8f9fa;
+          border-left: 4px solid #3498db;
+          padding: 15px;
+          margin: 15px 0;
+          border-radius: 4px;
+        }
+        .method {
+          display: inline-block;
+          padding: 4px 8px;
+          border-radius: 3px;
+          font-weight: bold;
+          font-size: 12px;
+          margin-right: 10px;
+        }
+        .get { background: #61affe; color: white; }
+        .post { background: #49cc90; color: white; }
+        .route {
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          color: #2c3e50;
+        }
+        .description {
+          margin-top: 8px;
+          color: #555;
+        }
+        .info {
+          background: #fff3cd;
+          border: 1px solid #ffc107;
+          padding: 15px;
+          border-radius: 4px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>🚀 Drawer Hello API Server</h1>
+      <p>This is the backend API server for the Drawer Hello mobile application. It provides endpoints for managing chat sessions and messages.</p>
+
+      <div class="info">
+        <strong>Server Status:</strong> Running on port ${PORT}<br>
+        <strong>Storage:</strong> In-memory (data will be lost on restart)
+      </div>
+
+      <h2>📋 API Endpoints</h2>
+
+      <div class="endpoint">
+        <div>
+          <span class="method get">GET</span>
+          <span class="route">/health</span>
+        </div>
+        <div class="description">Health check endpoint - returns server status</div>
+      </div>
+
+      <h3>Sessions</h3>
+
+      <div class="endpoint">
+        <div>
+          <span class="method get">GET</span>
+          <span class="route">/sessions</span>
+        </div>
+        <div class="description">Get a list of all chat sessions</div>
+      </div>
+
+      <div class="endpoint">
+        <div>
+          <span class="method post">POST</span>
+          <span class="route">/sessions</span>
+        </div>
+        <div class="description">Create a new chat session. Requires <code>title</code> in request body</div>
+      </div>
+
+      <h3>Messages</h3>
+
+      <div class="endpoint">
+        <div>
+          <span class="method get">GET</span>
+          <span class="route">/sessions/:sessionId/messages</span>
+        </div>
+        <div class="description">Get all messages for a specific session</div>
+      </div>
+
+      <div class="endpoint">
+        <div>
+          <span class="method post">POST</span>
+          <span class="route">/sessions/:sessionId/messages</span>
+        </div>
+        <div class="description">Add a new message to a session. Requires <code>text</code> and optional <code>sender</code> in request body</div>
+      </div>
+
+      <hr style="margin: 40px 0; border: none; border-top: 1px solid #ddd;">
+      <p style="text-align: center; color: #888; font-size: 14px;">
+        Drawer Hello API Server v1.0.0
+      </p>
+    </body>
+    </html>
+  `);
+});
+
 // Sessions endpoints
 
 // GET /sessions - Get all sessions
