@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,6 +16,7 @@ export default function CustomDrawerContent(props) {
 
   // State for conversations
   const [conversations, setConversations] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Get user settings
   const [userName, setUserName] = useState(SettingsService.getFullName());
@@ -41,6 +43,12 @@ export default function CustomDrawerContent(props) {
     setConversations(sessions);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadConversations();
+    setRefreshing(false);
+  };
+
   const navigateToConversation = (conversationId, title) => {
     navigation.navigate("Chat", { conversationId, title });
   };
@@ -54,7 +62,13 @@ export default function CustomDrawerContent(props) {
 
   return (
     <View style={styles.drawerContainer}>
-      <DrawerContentScrollView {...props} contentContainerStyle={styles.container}>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Main Navigation Section */}
         <View style={styles.section}>
           <TouchableOpacity

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  RefreshControl,
 } from "react-native";
 import ChatService from "../services/ChatService";
 import ChatInput from "../components/ChatInput";
@@ -19,6 +20,7 @@ export default function ChatScreen({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Update the header title and load messages when conversation changes
   useEffect(() => {
@@ -37,6 +39,12 @@ export default function ChatScreen({ route, navigation }) {
     } else {
       setMessages([]);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadMessages();
+    setRefreshing(false);
   };
 
   // Handle initial message from home screen
@@ -139,6 +147,9 @@ export default function ChatScreen({ route, navigation }) {
         contentContainerStyle={styles.messageList}
         inverted={false}
         ListFooterComponent={isTyping ? <TypingIndicator /> : null}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       <ChatInput

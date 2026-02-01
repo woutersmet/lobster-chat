@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacit
 import { useNavigation } from "@react-navigation/native";
 import SettingsService from "../services/SettingsService";
 import ApiService from "../services/ApiService";
+import ChatService from "../services/ChatService";
 import ChatInput from "../components/ChatInput";
 
 // Premade messages
@@ -49,12 +50,30 @@ export default function HomeScreen() {
     if (serverMode === 'server') {
       const result = await ApiService.checkHealth();
       setHealthStatus(result.success ? 'online' : 'offline');
+      return result;
     }
+    return { success: false };
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await checkHealth();
+
+    // Redo health check
+    const healthResult = await checkHealth();
+
+    // If health check is successful, refetch sessions and messages
+    if (healthResult && healthResult.success) {
+      // Refetch all sessions
+      const sessions = await ChatService.getAllSessions();
+
+      // Refetch messages for all sessions
+      if (sessions && sessions.length > 0) {
+        await Promise.all(
+          sessions.map(session => ChatService.getMessages(session.id))
+        );
+      }
+    }
+
     setRefreshing(false);
   };
 
