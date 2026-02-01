@@ -1,4 +1,4 @@
-# Drawer Hello
+# Lobster Chat
 
 A full-stack mobile application project consisting of an Expo-based React Native mobile app and a Node.js backend server.
 

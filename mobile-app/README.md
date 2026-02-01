@@ -1,6 +1,6 @@
-# Drawer Hello - Mobile App
+# Lobster Chat - Mobile App
 
-This is the mobile application for the Drawer Hello project, built with React Native and Expo.
+This is the mobile application for the Lobster Chat project, built with React Native and Expo.
 
 ## Features
 

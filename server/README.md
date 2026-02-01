@@ -1,6 +1,6 @@
-# Drawer Hello - Server
+# Lobster Chat - Server
 
-This is the backend API server for the Drawer Hello project, built with Node.js and Express.
+This is the backend API server for the Lobster Chat project, built with Node.js and Express.
 
 ## Features
 
