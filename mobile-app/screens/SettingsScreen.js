@@ -17,6 +17,7 @@ export default function SettingsScreen() {
   const [serverMode, setServerMode] = useState(SettingsService.getServerMode());
   const [healthStatus, setHealthStatus] = useState(null); // null, 'online', 'offline'
   const [isCheckingHealth, setIsCheckingHealth] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSave = () => {
     SettingsService.setNames(firstName, lastName);
@@ -27,11 +28,14 @@ export default function SettingsScreen() {
   const handleLocalWifi = () => {
     SettingsService.setLocalWifiUrl();
     setServerUrl(SettingsService.getServerUrl());
+    setErrorMessage(null);
+    setHealthStatus(null);
   };
 
   const handleCheckHealth = async () => {
     setIsCheckingHealth(true);
     setHealthStatus(null);
+    setErrorMessage(null);
 
     // Save the current URL before checking
     SettingsService.setServerUrl(serverUrl);
@@ -39,7 +43,14 @@ export default function SettingsScreen() {
     const result = await ApiService.checkHealth();
 
     setIsCheckingHealth(false);
-    setHealthStatus(result.success ? 'online' : 'offline');
+    if (result.success) {
+      setHealthStatus('online');
+      setErrorMessage(null);
+    } else {
+      setHealthStatus('offline');
+      const errorDetail = result.error || 'Unknown error';
+      setErrorMessage(`Health check failed: ${errorDetail}`);
+    }
   };
 
   return (
@@ -138,6 +149,11 @@ export default function SettingsScreen() {
               )}
             </TouchableOpacity>
           </View>
+
+          {/* Error Message Display */}
+          {errorMessage && (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          )}
         </>
       )}
 
@@ -255,6 +271,13 @@ const styles = StyleSheet.create({
   radioLabel: {
     fontSize: 16,
     color: "#333",
+  },
+  errorText: {
+    fontSize: 12,
+    color: "#F44336",
+    marginTop: -16,
+    marginBottom: 16,
+    paddingHorizontal: 4,
   },
 });
 
