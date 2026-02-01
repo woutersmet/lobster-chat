@@ -1,5 +1,13 @@
 # Lobster Chat
 
+![Lobster Chat](readme_project_image.png)
+
+An experimental mobile application exploring the possibility of creating a dedicated mobile app for [OpenClaw](https://github.com/openai/openclaw), following the same philosophy of running fully locally on your chosen machine as much as possible.
+
+**Status:** As of January 2026, this is very much in an early explorative work-in-progress stage.
+
+---
+
 A full-stack mobile application project consisting of an Expo-based React Native mobile app and a Node.js backend server.
 
 ## Project Structure
