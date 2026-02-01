@@ -5,8 +5,10 @@ This is the backend API server for the Drawer Hello project, built with Node.js 
 ## Features
 
 - RESTful API for managing chat sessions and messages
+- Interactive web-based chat interface at the root URL
 - In-memory data storage
 - CORS enabled for cross-origin requests
+- Organized controller structure
 
 ## Prerequisites
 
@@ -41,13 +43,22 @@ For development with auto-reload, you can use:
 npm run dev
 ```
 
+## Web Interface
+
+Navigate to `http://localhost:3000` in your browser to access the interactive chat interface. You can:
+- Create new chat sessions
+- Select sessions from the sidebar
+- Send and view messages in real-time
+
 ## API Endpoints
+
+All API endpoints are prefixed with `/api`.
 
 ### Sessions
 
 #### Get all sessions
 ```
-GET /sessions
+GET /api/sessions
 ```
 
 Returns a list of all chat sessions.
