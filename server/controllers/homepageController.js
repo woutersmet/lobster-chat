@@ -25,6 +25,7 @@ const getHomepage = (req, res) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Lobster Chat API Server</title>
+      <link rel="icon" type="image/png" href="/lobster-icon-square.png">
       <style>
         * {
           margin: 0;

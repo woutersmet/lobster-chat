@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  Image,
 } from "react-native";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
@@ -75,6 +76,11 @@ export default function CustomDrawerContent(props) {
             style={styles.drawerItem}
             onPress={() => navigation.navigate("Home")}
           >
+            <Image
+              source={require("../assets/lobster-icon-square.png")}
+              style={styles.homeIcon}
+              resizeMode="contain"
+            />
             <Text style={styles.drawerItemText}>Home</Text>
           </TouchableOpacity>
         </View>
@@ -155,10 +161,17 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   drawerItem: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 4,
+  },
+  homeIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
   },
   drawerItemText: {
     fontSize: 16,
