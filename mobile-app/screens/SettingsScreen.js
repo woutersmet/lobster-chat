@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import SettingsService from "../services/SettingsService";
 import ApiService from "../services/ApiService";
+import ChatService from "../services/ChatService";
 
 export default function SettingsScreen() {
   const [firstName, setFirstName] = useState(SettingsService.getFirstName());
@@ -17,12 +18,45 @@ export default function SettingsScreen() {
   const [serverMode, setServerMode] = useState(SettingsService.getServerMode());
   const [healthStatus, setHealthStatus] = useState(null); // null, 'online', 'offline'
   const [isCheckingHealth, setIsCheckingHealth] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    // Save settings
     SettingsService.setNames(firstName, lastName);
     SettingsService.setServerUrl(serverUrl);
     SettingsService.setServerMode(serverMode);
+
+    // If in server mode, recheck connection and refetch conversations
+    if (serverMode === 'server') {
+      setHealthStatus(null);
+      setErrorMessage(null);
+
+      const healthResult = await ApiService.checkHealth();
+
+      if (healthResult.success) {
+        setHealthStatus('online');
+        setErrorMessage(null);
+
+        // Refetch all sessions
+        const sessions = await ChatService.getAllSessions();
+
+        // Refetch messages for all sessions
+        if (sessions && sessions.length > 0) {
+          await Promise.all(
+            sessions.map(session => ChatService.getMessages(session.id))
+          );
+        }
+      } else {
+        setHealthStatus('offline');
+        const errorDetail = healthResult.error || 'Unknown error';
+        setErrorMessage(`Health check failed: ${errorDetail}`);
+      }
+    }
+
+    setIsSaving(false);
   };
 
   const handleLocalWifi = () => {
@@ -168,8 +202,16 @@ export default function SettingsScreen() {
         </>
       )}
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={handleSave}
+        disabled={isSaving}
+      >
+        {isSaving ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.saveButtonText}>Save Changes</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

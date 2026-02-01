@@ -90,7 +90,8 @@ export default function ChatScreen({ route, navigation }) {
     const userMessage = await ChatService.addMessage(conversationId, messageText, "user");
 
     if (userMessage) {
-      setMessages((prev) => [...prev, userMessage]);
+      // Reload messages from source of truth to avoid duplicates
+      await loadMessages();
     }
 
     // Show typing indicator
@@ -102,7 +103,8 @@ export default function ChatScreen({ route, navigation }) {
       const botMessage = await ChatService.addMessage(conversationId, botResponse, "bot");
 
       if (botMessage) {
-        setMessages((prev) => [...prev, botMessage]);
+        // Reload messages from source of truth to avoid duplicates
+        await loadMessages();
       }
       setIsTyping(false);
     }, 3000);

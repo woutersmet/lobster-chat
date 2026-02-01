@@ -171,9 +171,16 @@ class ChatService {
         sender: sender,
       };
 
-      if (mockChatSessions[sessionId]) {
-        mockChatSessions[sessionId].messages.push(newMessage);
+      // Create session if it doesn't exist (for "new" conversations)
+      if (!mockChatSessions[sessionId]) {
+        mockChatSessions[sessionId] = {
+          id: sessionId,
+          title: "New Chat",
+          messages: [],
+        };
       }
+
+      mockChatSessions[sessionId].messages.push(newMessage);
 
       return newMessage;
     }
