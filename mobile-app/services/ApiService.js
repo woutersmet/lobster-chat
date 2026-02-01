@@ -28,7 +28,6 @@ class ApiService {
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      console.error("Health check failed:", error);
       return { success: false, error: error.message };
     }
   }
@@ -55,7 +54,6 @@ class ApiService {
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      console.error("Failed to fetch sessions:", error);
       return { success: false, error: error.message };
     }
   }
@@ -83,7 +81,6 @@ class ApiService {
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      console.error("Failed to create session:", error);
       return { success: false, error: error.message };
     }
   }
@@ -110,7 +107,6 @@ class ApiService {
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      console.error("Failed to fetch messages:", error);
       return { success: false, error: error.message };
     }
   }
@@ -138,7 +134,6 @@ class ApiService {
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
-      console.error("Failed to create message:", error);
       return { success: false, error: error.message };
     }
   }

@@ -122,30 +122,41 @@ export default function SettingsScreen() {
             />
           </View>
 
+          {/* Server Status Badge */}
+          {healthStatus && (
+            <View style={styles.statusBadgeContainer}>
+              <View style={[
+                styles.statusBadge,
+                healthStatus === 'online' ? styles.statusBadgeOnline : styles.statusBadgeOffline
+              ]}>
+                <View style={[
+                  styles.statusDot,
+                  healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
+                ]} />
+                <Text style={[
+                  styles.statusBadgeText,
+                  healthStatus === 'online' ? styles.statusTextOnline : styles.statusTextOffline
+                ]}>
+                  {healthStatus === 'online' ? 'Online' : 'Offline'}
+                </Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.secondaryButton} onPress={handleLocalWifi}>
               <Text style={styles.secondaryButtonText}>Use Local WiFi</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.secondaryButton, styles.healthButton]}
+              style={styles.secondaryButton}
               onPress={handleCheckHealth}
               disabled={isCheckingHealth}
             >
               {isCheckingHealth ? (
                 <ActivityIndicator size="small" color="#000" />
               ) : (
-                <>
-                  {healthStatus && (
-                    <View style={[
-                      styles.statusDot,
-                      healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
-                    ]} />
-                  )}
-                  <Text style={styles.secondaryButtonText}>
-                    {healthStatus === 'online' ? 'Online' : healthStatus === 'offline' ? 'Offline' : 'Check Health'}
-                  </Text>
-                </>
+                <Text style={styles.secondaryButtonText}>Check</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -212,14 +223,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  healthButton: {
-    flexDirection: "row",
-    gap: 8,
-  },
   secondaryButtonText: {
     color: "#000",
     fontSize: 14,
     fontWeight: "600",
+  },
+  statusBadgeContainer: {
+    marginBottom: 16,
+    alignItems: "flex-start",
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 8,
+  },
+  statusBadgeOnline: {
+    backgroundColor: "#E8F5E9",
+  },
+  statusBadgeOffline: {
+    backgroundColor: "#FFEBEE",
+  },
+  statusBadgeText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  statusTextOnline: {
+    color: "#2E7D32",
+  },
+  statusTextOffline: {
+    color: "#C62828",
   },
   statusDot: {
     width: 10,
