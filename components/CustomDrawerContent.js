@@ -10,6 +10,7 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
+import { Ionicons } from "@expo/vector-icons";
 import ChatService from "../services/ChatService";
 
 export default function CustomDrawerContent(props) {
@@ -27,53 +28,68 @@ export default function CustomDrawerContent(props) {
   };
 
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={styles.container}>
-      {/* Main Navigation Section */}
-      <View style={styles.section}>
-        <TouchableOpacity
-          style={styles.drawerItem}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={styles.drawerItemText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.drawerItem}
-          onPress={() => navigation.navigate("Settings")}
-        >
-          <Text style={styles.drawerItemText}>Settings</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      {/* Conversations Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>CONVERSATIONS</Text>
-          <TouchableOpacity style={styles.newChatButton} onPress={createNewChat}>
-            <Text style={styles.newChatButtonText}>+ New</Text>
+    <View style={styles.drawerContainer}>
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.container}>
+        {/* Main Navigation Section */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Text style={styles.drawerItemText}>Home</Text>
           </TouchableOpacity>
         </View>
-        {conversations.map((conversation) => (
-          <TouchableOpacity
-            key={conversation.id}
-            style={styles.conversationItem}
-            onPress={() =>
-              navigateToConversation(conversation.id, conversation.title)
-            }
-          >
-            <Text style={styles.conversationText}>{conversation.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </DrawerContentScrollView>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Conversations Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>CONVERSATIONS</Text>
+            <TouchableOpacity style={styles.newChatButton} onPress={createNewChat}>
+              <Text style={styles.newChatButtonText}>+ New</Text>
+            </TouchableOpacity>
+          </View>
+          {conversations.map((conversation) => (
+            <TouchableOpacity
+              key={conversation.id}
+              style={styles.conversationItem}
+              onPress={() =>
+                navigateToConversation(conversation.id, conversation.title)
+              }
+            >
+              <Text style={styles.conversationText}>{conversation.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </DrawerContentScrollView>
+
+      {/* Profile Section - Pinned to Bottom */}
+      <TouchableOpacity
+        style={styles.profileSection}
+        onPress={() => navigation.navigate("Settings")}
+      >
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>WS</Text>
+        </View>
+        <Text style={styles.profileName}>Wouter Smet</Text>
+        <View style={styles.settingsIcon}>
+          <View style={styles.settingsIconOuter}>
+            <View style={styles.settingsIconInner} />
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  drawerContainer: {
     flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     paddingTop: 60,
   },
   section: {
@@ -129,6 +145,56 @@ const styles = StyleSheet.create({
     backgroundColor: "#e0e0e0",
     marginVertical: 16,
     marginHorizontal: 16,
+  },
+  profileSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    backgroundColor: "#fff",
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  avatarText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  profileName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  settingsIcon: {
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsIconOuter: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#999",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsIconInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#999",
   },
 });
 
