@@ -1,13 +1,30 @@
 const getHomepage = (req, res) => {
   const PORT = process.env.PORT || 3000;
-  
+
+  // Get local IP address
+  const os = require('os');
+  const networkInterfaces = os.networkInterfaces();
+  let localIP = 'localhost';
+
+  // Find the first non-internal IPv4 address
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
+    for (const iface of interfaces) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        localIP = iface.address;
+        break;
+      }
+    }
+    if (localIP !== 'localhost') break;
+  }
+
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Drawer Hello API Server</title>
+      <title>Lobster Chat API Server</title>
       <style>
         * {
           margin: 0;
@@ -35,6 +52,38 @@ const getHomepage = (req, res) => {
           font-size: 14px;
           color: #666;
           margin-bottom: 20px;
+        }
+        .instructions {
+          background: #f9f9f9;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 40px;
+        }
+        .instructions h2 {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 12px;
+          padding-bottom: 0;
+          border-bottom: none;
+        }
+        .instructions p {
+          font-size: 14px;
+          color: #555;
+          line-height: 1.6;
+          margin-bottom: 10px;
+        }
+        .instructions .server-url {
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 10px 12px;
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          color: #333;
+          margin-top: 8px;
+          display: inline-block;
         }
         .header-section {
           display: flex;
@@ -66,30 +115,10 @@ const getHomepage = (req, res) => {
           border: 1px solid #ddd;
           height: 500px;
         }
-        .api-endpoints {
-          list-style: none;
-        }
-        .endpoint {
-          margin: 8px 0;
-          font-family: 'Courier New', monospace;
-          color: #555;
-          font-size: 13px;
-        }
-        .method {
-          display: inline-block;
-          padding: 2px 6px;
-          border-radius: 2px;
-          font-weight: 600;
-          font-size: 11px;
-          margin-right: 8px;
-          background: #e5e5e5;
-          color: #333;
-          min-width: 45px;
-          text-align: center;
-        }
+
         .sidebar {
           width: 250px;
-          background: #fafafa;
+          background: white;
           border-right: 1px solid #ddd;
           display: flex;
           flex-direction: column;
@@ -97,7 +126,7 @@ const getHomepage = (req, res) => {
         .sidebar-header {
           padding: 15px;
           background: white;
-          border-bottom: 1px solid #ddd;
+          border-bottom: 1px solid #e5e5e5;
         }
         .sidebar-header h3 {
           font-size: 14px;
@@ -174,17 +203,17 @@ const getHomepage = (req, res) => {
           flex: 1;
           overflow-y: auto;
           padding: 20px;
-          background: #fafafa;
+          background: white;
         }
         .message {
           margin-bottom: 12px;
-          padding: 10px 12px;
-          border-radius: 3px;
+          padding: 10px 14px;
+          border-radius: 18px;
           max-width: 70%;
         }
         .message.user {
-          background: #333;
-          color: white;
+          background: #e5e5e5;
+          color: #333;
           margin-left: auto;
         }
         .message.assistant {
@@ -197,6 +226,9 @@ const getHomepage = (req, res) => {
           font-weight: 600;
           margin-bottom: 3px;
           opacity: 0.7;
+        }
+        .message.user .message-sender {
+          display: none;
         }
         .message-text {
           word-wrap: break-word;
@@ -218,17 +250,22 @@ const getHomepage = (req, res) => {
         }
         .message-form input {
           flex: 1;
-          padding: 8px 10px;
-          border: 1px solid #ccc;
-          border-radius: 2px;
+          padding: 10px 16px;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          background: #f5f5f5;
           font-size: 13px;
         }
+        .message-form input:focus {
+          outline: none;
+          border-color: #ccc;
+        }
         .message-form button {
-          padding: 8px 16px;
+          padding: 10px 20px;
           background: #333;
           color: white;
           border: none;
-          border-radius: 2px;
+          border-radius: 20px;
           cursor: pointer;
           font-size: 13px;
         }
@@ -255,39 +292,40 @@ const getHomepage = (req, res) => {
           <img src="/lobster_with_phone.png" alt="Lobster with Phone" class="lobster-image">
         </div>
 
-        <section>
-          <h2>API Endpoints</h2>
-          <div class="api-endpoints">
-            <div class="endpoint"><span class="method">GET</span> /api/health - Health check</div>
-            <div class="endpoint"><span class="method">GET</span> /api/sessions - Get all sessions</div>
-            <div class="endpoint"><span class="method">POST</span> /api/sessions - Create session</div>
-            <div class="endpoint"><span class="method">GET</span> /api/sessions/:id/messages - Get messages</div>
-            <div class="endpoint"><span class="method">POST</span> /api/sessions/:id/messages - Add message</div>
-          </div>
-        </section>
+        <div class="instructions">
+          <h2>Connect Your Mobile App</h2>
+          <p>You're seeing this page because the API is running and ready for your chat app to connect to.</p>
+          <p><strong>To connect:</strong></p>
+          <ol style="margin-left: 20px; margin-top: 8px;">
+            <li style="margin-bottom: 6px;">Open your mobile <strong>Lobster Chat</strong> app</li>
+            <li style="margin-bottom: 6px;">Go to <strong>Settings</strong></li>
+            <li style="margin-bottom: 6px;">Point the server to:</li>
+          </ol>
+          <div class="server-url">http://${localIP}:${PORT}</div>
+        </div>
 
         <section>
           <h2>Chat Preview</h2>
           <div class="container">
             <div class="sidebar">
               <div class="sidebar-header">
-                <h3>Sessions</h3>
+                <h3>Conversations</h3>
                 <form class="new-session-form" id="newSessionForm">
-                  <input type="text" id="sessionTitle" placeholder="New session title..." required>
+                  <input type="text" id="sessionTitle" placeholder="New conversation..." required>
                   <button type="submit">Create</button>
                 </form>
               </div>
               <div class="sessions-list" id="sessionsList">
-                <div class="empty-state">No sessions yet</div>
+                <div class="empty-state">No conversations yet</div>
               </div>
             </div>
 
             <div class="main-content">
               <div class="chat-header">
-                <h3 id="chatTitle">Select a session</h3>
+                <h3 id="chatTitle">Select a conversation</h3>
               </div>
               <div class="messages-container" id="messagesContainer">
-                <div class="empty-state">Select a session to view messages</div>
+                <div class="empty-state">Select a conversation to view messages</div>
               </div>
               <div class="input-container">
                 <form class="message-form" id="messageForm">
@@ -319,7 +357,7 @@ const getHomepage = (req, res) => {
           const sessionsList = document.getElementById('sessionsList');
 
           if (sessions.length === 0) {
-            sessionsList.innerHTML = '<div class="empty-state">No sessions yet</div>';
+            sessionsList.innerHTML = '<div class="empty-state">No conversations yet</div>';
             return;
           }
 
