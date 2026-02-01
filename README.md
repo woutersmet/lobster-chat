@@ -12,7 +12,7 @@ A full-stack mobile application project consisting of an Expo-based React Native
 
 ## Project Structure
 
-This repository contains two main components:
+This repository contains three main components:
 
 ### 📱 Mobile App (`/mobile-app`)
 A React Native mobile application built with Expo, featuring:
@@ -31,6 +31,15 @@ A Node.js/Express backend API server providing:
 - CORS-enabled for mobile app integration
 
 [View Server Documentation](./server/README.md)
+
+### 🔌 OpenClaw Plugin (`/openclaw-plugins`)
+An OpenClaw channel plugin that integrates the Lobster Chat server with OpenClaw:
+- Custom channel registration (similar to WhatsApp/Telegram)
+- Bidirectional message flow between OpenClaw and Lobster Chat
+- Webhook integration for inbound messages
+- Direct delivery for outbound messages
+
+[View OpenClaw Plugin Documentation](./openclaw-plugins/README.md)
 
 ## Quick Start
 
@@ -74,6 +83,12 @@ A Node.js/Express backend API server providing:
 - Node.js
 - Express.js
 - CORS
+- better-sqlite3
+
+**OpenClaw Integration:**
+- OpenClaw Plugin API
+- Custom channel implementation
+- Webhook-based messaging
 
 ## License
 

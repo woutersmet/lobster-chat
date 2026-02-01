@@ -74,7 +74,35 @@ To receive messages from the Lobster Chat server, enable the webhook endpoint in
 
 **Important:** Replace `"shared-secret"` with a secure token that both OpenClaw and your Lobster Chat server will use to authenticate webhook requests.
 
-### 4. Update the Plugin for Outbound Messages
+### 4. Configure Hook Mappings (Route Replies Back to Your App)
+
+To make OpenClaw's agent replies flow back to your app channel, configure hook mappings in your OpenClaw config. This tells OpenClaw to deliver agent responses to your custom channel:
+
+```json
+{
+  "hooks": {
+    "enabled": true,
+    "token": "shared-secret",
+    "path": "/hooks",
+    "mappings": [
+      {
+        "path": "/hooks/wake",
+        "actions": [
+          {
+            "deliver": true,
+            "channel": "myapp",
+            "to": "{{from}}"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+This mapping ensures that when `/hooks/wake` is triggered, the agent's reply is delivered back to the `myapp` channel (your plugin), which will call your plugin's `sendText()` function, which POSTs to your Node server.
+
+### 5. Update the Plugin for Outbound Messages
 
 Edit `openclaw-lobsterchat-plugin.js` to implement the actual HTTP POST to your server:
 
@@ -110,13 +138,13 @@ outbound: {
 },
 ```
 
-### 5. Update Lobster Chat Server (Inbound Messages)
+### 6. Update Lobster Chat Server (Wake the Agent)
 
-Add a webhook endpoint to your Node server (`server/server.js`) to send messages to OpenClaw:
+Add a webhook endpoint to your Node server (`server/server.js`) to "wake" the OpenClaw agent when a user sends a message. This uses OpenClaw's webhook system for external triggers:
 
 ```javascript
 // Add this endpoint to receive messages from the mobile app
-// and forward them to OpenClaw
+// and wake the OpenClaw agent
 app.post('/openclaw/send', async (req, res) => {
   const { text, sessionId, sender } = req.body;
 
@@ -124,33 +152,46 @@ app.post('/openclaw/send', async (req, res) => {
     // Store the message in your database
     const message = db.createMessage(sessionId, text, sender);
 
-    // Forward to OpenClaw webhook
-    const openclawUrl = process.env.OPENCLAW_URL || 'http://localhost:8080';
+    // Wake the OpenClaw agent via webhook
+    const openclawUrl = process.env.OPENCLAW_URL || 'http://127.0.0.1:18789';
     const webhookToken = process.env.OPENCLAW_WEBHOOK_TOKEN || 'shared-secret';
 
-    await fetch(`${openclawUrl}/hooks`, {
+    const response = await fetch(`${openclawUrl}/hooks/wake`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${webhookToken}`,
       },
       body: JSON.stringify({
-        channel: 'myapp',
         from: sender,
         text: text,
+        sessionId: sessionId,
         timestamp: new Date().toISOString(),
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`OpenClaw webhook failed: ${response.status}`);
+    }
+
     res.status(201).json(message);
   } catch (error) {
-    console.error('Error forwarding to OpenClaw:', error);
+    console.error('Error waking OpenClaw agent:', error);
     res.status(500).json({ error: 'Failed to send message' });
   }
 });
 ```
 
-### 6. Add Outbound Endpoint to Lobster Chat Server
+**How it works:**
+1. User sends a message from the mobile app
+2. Your Node server stores the message in the database
+3. Server POSTs to `http://127.0.0.1:18789/hooks/wake` (authenticated with the webhook token)
+4. OpenClaw agent processes the message
+5. Agent's reply is routed back via the hook mapping (configured in step 4)
+6. Hook mapping triggers your plugin's `sendText()` which POSTs to your server
+7. Your server stores the reply and the mobile app fetches/displays it
+
+### 7. Add Outbound Endpoint to Lobster Chat Server
 
 Add an endpoint to receive messages from OpenClaw (`server/server.js`):
 
@@ -177,6 +218,36 @@ app.post('/openclaw/deliver', async (req, res) => {
   }
 });
 ```
+
+---
+
+## Incremental Implementation Strategy
+
+If you want to build this integration step-by-step, here's a recommended milestone approach:
+
+### Milestone 1: Basic OpenClaw Setup
+1. Install and run OpenClaw Gateway
+2. Access the OpenClaw control UI
+3. Verify basic chat functionality works in the OpenClaw UI
+
+### Milestone 2: Wake the Agent (Inbound Only)
+1. Enable webhooks in OpenClaw config (step 3)
+2. Add the `/openclaw/send` endpoint to your Node server (step 6)
+3. Test triggering the agent from your app by POSTing to `/hooks/wake`
+4. Verify the agent responds (you'll see responses in OpenClaw's UI at this stage)
+
+**At this point, you can trigger the agent from your app, but replies only show in OpenClaw's UI.**
+
+### Milestone 3: Full Bidirectional Flow
+1. Create and install the custom channel plugin (steps 1-2)
+2. Configure hook mappings to route replies to your channel (step 4)
+3. Implement the outbound endpoint `/openclaw/deliver` (step 7)
+4. Update the plugin's `sendText()` to POST to your server (step 5)
+5. Test the complete round-trip: app → server → OpenClaw → server → app
+
+**Now replies land back in your app instead of only in OpenClaw's UI.**
+
+This incremental approach lets you validate each piece before adding complexity.
 
 ---
 
@@ -214,31 +285,13 @@ Add these to your server's `.env` file:
 
 ```bash
 # OpenClaw integration
-OPENCLAW_URL=http://localhost:8080
+OPENCLAW_URL=http://127.0.0.1:18789
 OPENCLAW_WEBHOOK_TOKEN=shared-secret
 ```
 
+**Note:** The default OpenClaw Gateway runs on port `18789`. Adjust if your setup uses a different port.
+
 ---
-
-## Troubleshooting
-
-### Messages not appearing in OpenClaw
-- Verify the webhook endpoint is enabled in OpenClaw config
-- Check that the webhook token matches in both configs
-- Verify the OpenClaw URL is correct
-- Check OpenClaw logs for webhook errors
-
-### Messages not appearing in Lobster Chat
-- Verify the plugin is installed: `openclaw plugins list`
-- Check the server URL in the channel config
-- Verify the `/openclaw/deliver` endpoint is accessible
-- Check server logs for incoming requests
-
-### Plugin not loading
-- Ensure the plugin file is in the correct directory
-- Verify the plugin syntax is valid JavaScript
-- Check OpenClaw logs for plugin loading errors
-- Try reinstalling: `openclaw plugins uninstall openclaw-lobsterchat-plugin && openclaw plugins install ./path/to/plugin`
 
 ---
 
