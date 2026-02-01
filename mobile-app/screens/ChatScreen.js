@@ -27,61 +27,64 @@ export default function ChatScreen({ route, navigation }) {
     });
 
     // Load messages for this conversation
-    const loadedMessages = ChatService.getMessages(conversationId);
-    setMessages(loadedMessages);
+    loadMessages();
   }, [conversationId, conversationTitle, navigation]);
+
+  const loadMessages = async () => {
+    if (conversationId !== "new") {
+      const loadedMessages = await ChatService.getMessages(conversationId);
+      setMessages(loadedMessages);
+    } else {
+      setMessages([]);
+    }
+  };
 
   // Handle initial message from home screen
   useEffect(() => {
     if (initialMessage && initialMessage.trim() !== "") {
-      // Send the initial message
-      const userMessage = {
-        id: Date.now().toString(),
-        text: initialMessage,
-        sender: "user",
-      };
-
-      setMessages((prev) => [...prev, userMessage]);
-
-      // Show typing indicator
-      setIsTyping(true);
-
-      // Send bot response after 3 seconds
-      setTimeout(() => {
-        const botMessage = {
-          id: (Date.now() + 1).toString(),
-          text: ChatService.getRandomBotResponse(),
-          sender: "bot",
-        };
-        setMessages((prev) => [...prev, botMessage]);
-        setIsTyping(false);
-      }, 3000);
+      handleInitialMessage();
     }
   }, [initialMessage]);
 
-  const sendMessage = () => {
+  const handleInitialMessage = async () => {
+    // If this is a new conversation, create it first
+    if (conversationId === "new") {
+      const newSession = await ChatService.createNewSession("New Chat");
+      navigation.setParams({ conversationId: newSession.id });
+    }
+
+    // Send the initial message
+    await sendMessageToServer(initialMessage);
+  };
+
+  const sendMessage = async () => {
     if (inputText.trim() === "") return;
 
-    const userMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    const messageText = inputText;
     setInputText("");
+
+    await sendMessageToServer(messageText);
+  };
+
+  const sendMessageToServer = async (messageText) => {
+    // Add user message to the server
+    const userMessage = await ChatService.addMessage(conversationId, messageText, "user");
+
+    if (userMessage) {
+      setMessages((prev) => [...prev, userMessage]);
+    }
 
     // Show typing indicator
     setIsTyping(true);
 
     // Send bot response after 3 seconds
-    setTimeout(() => {
-      const botMessage = {
-        id: (Date.now() + 1).toString(),
-        text: ChatService.getRandomBotResponse(),
-        sender: "bot",
-      };
-      setMessages((prev) => [...prev, botMessage]);
+    setTimeout(async () => {
+      const botResponse = ChatService.getRandomBotResponse();
+      const botMessage = await ChatService.addMessage(conversationId, botResponse, "bot");
+
+      if (botMessage) {
+        setMessages((prev) => [...prev, botMessage]);
+      }
       setIsTyping(false);
     }, 3000);
   };

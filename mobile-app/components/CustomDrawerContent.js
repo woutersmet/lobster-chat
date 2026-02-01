@@ -13,14 +13,19 @@ import SettingsService from "../services/SettingsService";
 export default function CustomDrawerContent(props) {
   const { navigation } = props;
 
-  // Get conversations from ChatService
-  const conversations = ChatService.getAllSessions();
+  // State for conversations
+  const [conversations, setConversations] = useState([]);
 
   // Get user settings
   const [userName, setUserName] = useState(SettingsService.getFullName());
   const [userInitials, setUserInitials] = useState(
     SettingsService.getUserInitials()
   );
+
+  // Load conversations on mount
+  useEffect(() => {
+    loadConversations();
+  }, []);
 
   // Subscribe to settings changes
   useEffect(() => {
@@ -31,12 +36,20 @@ export default function CustomDrawerContent(props) {
     return unsubscribe;
   }, []);
 
+  const loadConversations = async () => {
+    const sessions = await ChatService.getAllSessions();
+    setConversations(sessions);
+  };
+
   const navigateToConversation = (conversationId, title) => {
     navigation.navigate("Chat", { conversationId, title });
   };
 
-  const createNewChat = () => {
-    navigation.navigate("Chat", { conversationId: "new", title: "New Chat" });
+  const createNewChat = async () => {
+    const newSession = await ChatService.createNewSession();
+    navigation.navigate("Chat", { conversationId: newSession.id, title: newSession.title });
+    // Reload conversations to show the new one
+    loadConversations();
   };
 
   return (

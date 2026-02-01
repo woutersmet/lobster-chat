@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from "react-native";
+import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SettingsService from "../services/SettingsService";
 import ChatInput from "../components/ChatInput";
@@ -55,6 +55,11 @@ export default function HomeScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
+          <Image
+            source={require("../assets/mobile_app_lobster.png")}
+            style={styles.lobsterImage}
+            resizeMode="contain"
+          />
           <Text style={styles.welcomeText}>Welcome, {userFirstName}</Text>
           <Text style={styles.subtitle}>How can I help you today?</Text>
         </View>
@@ -95,6 +100,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+  },
+  lobsterImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 24,
   },
   welcomeText: {
     fontSize: 28,

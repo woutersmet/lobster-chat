@@ -5,20 +5,47 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import SettingsService from "../services/SettingsService";
+import ApiService from "../services/ApiService";
 
 export default function SettingsScreen() {
   const [firstName, setFirstName] = useState(SettingsService.getFirstName());
   const [lastName, setLastName] = useState(SettingsService.getLastName());
+  const [serverUrl, setServerUrl] = useState(SettingsService.getServerUrl());
+  const [healthStatus, setHealthStatus] = useState(null); // null, 'online', 'offline'
+  const [isCheckingHealth, setIsCheckingHealth] = useState(false);
 
   const handleSave = () => {
     SettingsService.setNames(firstName, lastName);
+    SettingsService.setServerUrl(serverUrl);
+  };
+
+  const handleLocalWifi = () => {
+    SettingsService.setLocalWifiUrl();
+    setServerUrl(SettingsService.getServerUrl());
+  };
+
+  const handleCheckHealth = async () => {
+    setIsCheckingHealth(true);
+    setHealthStatus(null);
+
+    // Save the current URL before checking
+    SettingsService.setServerUrl(serverUrl);
+
+    const result = await ApiService.checkHealth();
+
+    setIsCheckingHealth(false);
+    setHealthStatus(result.success ? 'online' : 'offline');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile Settings</Text>
+      <Text style={styles.title}>Settings</Text>
+
+      {/* Profile Settings Section */}
+      <Text style={styles.sectionTitle}>Profile</Text>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>First Name</Text>
@@ -42,6 +69,50 @@ export default function SettingsScreen() {
         />
       </View>
 
+      {/* Online Server Section */}
+      <Text style={styles.sectionTitle}>Online Server</Text>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Server URL</Text>
+        <TextInput
+          style={styles.input}
+          value={serverUrl}
+          onChangeText={setServerUrl}
+          placeholder="http://192.168.1.23:3000"
+          placeholderTextColor="#999"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.secondaryButton} onPress={handleLocalWifi}>
+          <Text style={styles.secondaryButtonText}>Use Local WiFi</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.secondaryButton, styles.healthButton]}
+          onPress={handleCheckHealth}
+          disabled={isCheckingHealth}
+        >
+          {isCheckingHealth ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <>
+              {healthStatus && (
+                <View style={[
+                  styles.statusDot,
+                  healthStatus === 'online' ? styles.statusOnline : styles.statusOffline
+                ]} />
+              )}
+              <Text style={styles.secondaryButtonText}>
+                {healthStatus === 'online' ? 'Online' : healthStatus === 'offline' ? 'Offline' : 'Check Health'}
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save Changes</Text>
       </TouchableOpacity>
@@ -58,8 +129,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 32,
+    marginBottom: 24,
     marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 16,
+    marginTop: 8,
   },
   inputGroup: {
     marginBottom: 24,
@@ -76,6 +154,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 24,
+  },
+  secondaryButton: {
+    flex: 1,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  healthButton: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  secondaryButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  statusOnline: {
+    backgroundColor: "#4CAF50",
+  },
+  statusOffline: {
+    backgroundColor: "#F44336",
   },
   saveButton: {
     backgroundColor: "#000",

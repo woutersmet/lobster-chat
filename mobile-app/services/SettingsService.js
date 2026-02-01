@@ -2,6 +2,7 @@
 let userSettings = {
   firstName: "Wouter",
   lastName: "Smet",
+  serverUrl: "", // Default empty, user needs to configure
 };
 
 // Listeners for settings changes
@@ -51,6 +52,23 @@ class SettingsService {
   static setNames(firstName, lastName) {
     userSettings.firstName = firstName;
     userSettings.lastName = lastName;
+    this.notifyListeners();
+  }
+
+  // Get server URL
+  static getServerUrl() {
+    return userSettings.serverUrl;
+  }
+
+  // Set server URL
+  static setServerUrl(serverUrl) {
+    userSettings.serverUrl = serverUrl;
+    this.notifyListeners();
+  }
+
+  // Set server URL to local WiFi default
+  static setLocalWifiUrl() {
+    userSettings.serverUrl = "http://192.168.1.23:3000";
     this.notifyListeners();
   }
 
