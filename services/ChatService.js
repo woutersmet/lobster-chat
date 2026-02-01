@@ -52,6 +52,20 @@ const chatSessions = {
   },
 };
 
+// Random bot responses
+const BOT_RESPONSES = [
+  "That's interesting! Tell me more.",
+  "I understand what you mean.",
+  "Great question! Let me think about that.",
+  "I see where you're coming from.",
+  "That makes sense to me.",
+  "Thanks for sharing that with me.",
+  "I appreciate your perspective.",
+  "Could you elaborate on that?",
+  "That's a good point.",
+  "I'm here to help!",
+];
+
 class ChatService {
   // Get all chat sessions
   static getAllSessions() {
@@ -83,6 +97,11 @@ class ChatService {
     if (chatSessions[sessionId]) {
       chatSessions[sessionId].messages.push(message);
     }
+  }
+
+  // Get a random bot response
+  static getRandomBotResponse() {
+    return BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)];
   }
 }
 

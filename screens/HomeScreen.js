@@ -1,18 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import SettingsService from "../services/SettingsService";
 import ChatInput from "../components/ChatInput";
 
+// Premade messages
+const PREMADE_MESSAGES = [
+  {
+    label: "Inbox summary",
+    message: "Give an update on most recent and important emails coming in.",
+  },
+  {
+    label: "Calendar summary",
+    message: "How is my calendar looking today?",
+  },
+  {
+    label: "Motivation",
+    message: "Give me a motivating quote",
+  },
+];
+
 export default function HomeScreen() {
-  const [userName, setUserName] = useState(SettingsService.getFullName());
+  const [userFirstName, setUserFirstName] = useState(SettingsService.getFirstName());
   const [inputText, setInputText] = useState("");
   const navigation = useNavigation();
 
   // Subscribe to settings changes
   useEffect(() => {
     const unsubscribe = SettingsService.subscribe(() => {
-      setUserName(SettingsService.getFullName());
+      setUserFirstName(SettingsService.getFirstName());
     });
     return unsubscribe;
   }, []);
@@ -27,16 +43,34 @@ export default function HomeScreen() {
     setInputText("");
   };
 
+  const handlePremadeMessage = (message) => {
+    setInputText(message);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
-      <View style={styles.content}>
-        <Text style={styles.welcomeText}>Welcome, {userName}</Text>
-        <Text style={styles.subtitle}>How can I help you today?</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.content}>
+          <Text style={styles.welcomeText}>Welcome, {userFirstName}</Text>
+          <Text style={styles.subtitle}>How can I help you today?</Text>
+        </View>
+
+        <View style={styles.premadeContainer}>
+          {PREMADE_MESSAGES.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.premadeButton}
+              onPress={() => handlePremadeMessage(item.message)}
+            >
+              <Text style={styles.premadeLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
       <ChatInput
         value={inputText}
@@ -53,6 +87,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     alignItems: "center",
@@ -68,6 +105,27 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: "#666",
+    marginBottom: 32,
+  },
+  premadeContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 8,
+    justifyContent: "center",
+  },
+  premadeButton: {
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  premadeLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "400",
   },
 });
 

@@ -10,23 +10,10 @@ import {
 import ChatService from "../services/ChatService";
 import ChatInput from "../components/ChatInput";
 
-// Random bot responses
-const BOT_RESPONSES = [
-  "That's interesting! Tell me more.",
-  "I understand what you mean.",
-  "Great question! Let me think about that.",
-  "I see where you're coming from.",
-  "That makes sense to me.",
-  "Thanks for sharing that with me.",
-  "I appreciate your perspective.",
-  "Could you elaborate on that?",
-  "That's a good point.",
-  "I'm here to help!",
-];
-
 export default function ChatScreen({ route, navigation }) {
   const conversationId = route.params?.conversationId || "default";
   const conversationTitle = route.params?.title || "Chat";
+  const initialMessage = route.params?.initialMessage;
 
   // Load messages from ChatService based on conversationId
   const [messages, setMessages] = useState([]);
@@ -43,6 +30,34 @@ export default function ChatScreen({ route, navigation }) {
     const loadedMessages = ChatService.getMessages(conversationId);
     setMessages(loadedMessages);
   }, [conversationId, conversationTitle, navigation]);
+
+  // Handle initial message from home screen
+  useEffect(() => {
+    if (initialMessage && initialMessage.trim() !== "") {
+      // Send the initial message
+      const userMessage = {
+        id: Date.now().toString(),
+        text: initialMessage,
+        sender: "user",
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+
+      // Show typing indicator
+      setIsTyping(true);
+
+      // Send bot response after 3 seconds
+      setTimeout(() => {
+        const botMessage = {
+          id: (Date.now() + 1).toString(),
+          text: ChatService.getRandomBotResponse(),
+          sender: "bot",
+        };
+        setMessages((prev) => [...prev, botMessage]);
+        setIsTyping(false);
+      }, 3000);
+    }
+  }, [initialMessage]);
 
   const sendMessage = () => {
     if (inputText.trim() === "") return;
@@ -61,11 +76,9 @@ export default function ChatScreen({ route, navigation }) {
 
     // Send bot response after 3 seconds
     setTimeout(() => {
-      const randomResponse =
-        BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)];
       const botMessage = {
         id: (Date.now() + 1).toString(),
-        text: randomResponse,
+        text: ChatService.getRandomBotResponse(),
         sender: "bot",
       };
       setMessages((prev) => [...prev, botMessage]);
