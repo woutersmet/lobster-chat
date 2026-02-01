@@ -4,12 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
-import {
-  DrawerContentScrollView,
-  DrawerItemList,
-} from "@react-navigation/drawer";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import ChatService from "../services/ChatService";
 
@@ -74,11 +70,7 @@ export default function CustomDrawerContent(props) {
           <Text style={styles.avatarText}>WS</Text>
         </View>
         <Text style={styles.profileName}>Wouter Smet</Text>
-        <View style={styles.settingsIcon}>
-          <View style={styles.settingsIconOuter}>
-            <View style={styles.settingsIconInner} />
-          </View>
-        </View>
+        <Ionicons name="settings-outline" size={20} color="#999" />
       </TouchableOpacity>
     </View>
   );
@@ -174,27 +166,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
-  },
-  settingsIcon: {
-    width: 20,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  settingsIconOuter: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "#999",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  settingsIconInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#999",
   },
 });
 
