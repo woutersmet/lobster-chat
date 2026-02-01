@@ -34,7 +34,21 @@ const getHomepage = (req, res) => {
         .subtitle {
           font-size: 14px;
           color: #666;
+          margin-bottom: 20px;
+        }
+        .header-section {
+          display: flex;
+          align-items: center;
+          gap: 30px;
           margin-bottom: 40px;
+        }
+        .header-text {
+          flex: 1;
+        }
+        .lobster-image {
+          width: 150px;
+          height: auto;
+          border-radius: 8px;
         }
         section {
           margin-bottom: 50px;
@@ -233,8 +247,13 @@ const getHomepage = (req, res) => {
     </head>
     <body>
       <div class="wrapper">
-        <h1>You are online!</h1>
-        <p class="subtitle">This means the server is running on port ${PORT}</p>
+        <div class="header-section">
+          <div class="header-text">
+            <h1>You are online!</h1>
+            <p class="subtitle">This means the server is running on port ${PORT}</p>
+          </div>
+          <img src="/lobster_with_phone.png" alt="Lobster with Phone" class="lobster-image">
+        </div>
 
         <section>
           <h2>API Endpoints</h2>

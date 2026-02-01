@@ -1,4 +1,4 @@
-const db = require('../db/database');
+const db = require('../db/databaseService');
 
 // GET /api/sessions - Get all sessions
 const getSessions = (req, res) => {
