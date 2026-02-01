@@ -10,6 +10,20 @@ import {
 import ChatService from "../services/ChatService";
 import ChatInput from "../components/ChatInput";
 
+// Random bot responses
+const BOT_RESPONSES = [
+  "That's interesting! Tell me more.",
+  "I understand what you mean.",
+  "Great question! Let me think about that.",
+  "I see where you're coming from.",
+  "That makes sense to me.",
+  "Thanks for sharing that with me.",
+  "I appreciate your perspective.",
+  "Could you elaborate on that?",
+  "That's a good point.",
+  "I'm here to help!",
+];
+
 export default function ChatScreen({ route, navigation }) {
   const conversationId = route.params?.conversationId || "default";
   const conversationTitle = route.params?.title || "Chat";
@@ -17,6 +31,7 @@ export default function ChatScreen({ route, navigation }) {
   // Load messages from ChatService based on conversationId
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   // Update the header title and load messages when conversation changes
   useEffect(() => {
@@ -32,14 +47,30 @@ export default function ChatScreen({ route, navigation }) {
   const sendMessage = () => {
     if (inputText.trim() === "") return;
 
-    const newMessage = {
+    const userMessage = {
       id: Date.now().toString(),
       text: inputText,
       sender: "user",
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputText("");
+
+    // Show typing indicator
+    setIsTyping(true);
+
+    // Send bot response after 3 seconds
+    setTimeout(() => {
+      const randomResponse =
+        BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)];
+      const botMessage = {
+        id: (Date.now() + 1).toString(),
+        text: randomResponse,
+        sender: "bot",
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 3000);
   };
 
   const renderMessage = ({ item }) => {
@@ -58,6 +89,27 @@ export default function ChatScreen({ route, navigation }) {
     );
   };
 
+  const TypingIndicator = () => {
+    const [dots, setDots] = useState(".");
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setDots((prev) => {
+          if (prev === "...") return ".";
+          return prev + ".";
+        });
+      }, 500);
+
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <View style={[styles.messageBubble, styles.botBubble]}>
+        <Text style={styles.messageText}>typing{dots}</Text>
+      </View>
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -70,6 +122,7 @@ export default function ChatScreen({ route, navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
         inverted={false}
+        ListFooterComponent={isTyping ? <TypingIndicator /> : null}
       />
 
       <ChatInput

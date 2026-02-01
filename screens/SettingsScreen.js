@@ -9,16 +9,11 @@ import {
 import SettingsService from "../services/SettingsService";
 
 export default function SettingsScreen() {
-  const [userName, setUserName] = useState(SettingsService.getUserName());
-  const [userInitials, setUserInitials] = useState(
-    SettingsService.getUserInitials()
-  );
+  const [firstName, setFirstName] = useState(SettingsService.getFirstName());
+  const [lastName, setLastName] = useState(SettingsService.getLastName());
 
   const handleSave = () => {
-    SettingsService.setUserName(userName);
-    if (userInitials.trim()) {
-      SettingsService.setUserInitials(userInitials);
-    }
+    SettingsService.setNames(firstName, lastName);
   };
 
   return (
@@ -26,25 +21,24 @@ export default function SettingsScreen() {
       <Text style={styles.title}>Profile Settings</Text>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>First Name</Text>
         <TextInput
           style={styles.input}
-          value={userName}
-          onChangeText={setUserName}
-          placeholder="Enter your name"
+          value={firstName}
+          onChangeText={setFirstName}
+          placeholder="Enter your first name"
           placeholderTextColor="#999"
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Initials</Text>
+        <Text style={styles.label}>Last Name</Text>
         <TextInput
           style={styles.input}
-          value={userInitials}
-          onChangeText={setUserInitials}
-          placeholder="Enter initials"
+          value={lastName}
+          onChangeText={setLastName}
+          placeholder="Enter your last name"
           placeholderTextColor="#999"
-          maxLength={2}
         />
       </View>
 

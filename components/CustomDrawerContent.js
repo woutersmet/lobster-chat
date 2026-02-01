@@ -17,16 +17,16 @@ export default function CustomDrawerContent(props) {
   const conversations = ChatService.getAllSessions();
 
   // Get user settings
-  const [userName, setUserName] = useState(SettingsService.getUserName());
+  const [userName, setUserName] = useState(SettingsService.getFullName());
   const [userInitials, setUserInitials] = useState(
     SettingsService.getUserInitials()
   );
 
   // Subscribe to settings changes
   useEffect(() => {
-    const unsubscribe = SettingsService.subscribe((settings) => {
-      setUserName(settings.userName);
-      setUserInitials(settings.userInitials);
+    const unsubscribe = SettingsService.subscribe(() => {
+      setUserName(SettingsService.getFullName());
+      setUserInitials(SettingsService.getUserInitials());
     });
     return unsubscribe;
   }, []);

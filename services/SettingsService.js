@@ -1,21 +1,33 @@
 // User settings data
 let userSettings = {
-  userName: "Wouter Smet",
-  userInitials: "WS",
+  firstName: "Wouter",
+  lastName: "Smet",
 };
 
 // Listeners for settings changes
 const listeners = [];
 
 class SettingsService {
-  // Get user name
-  static getUserName() {
-    return userSettings.userName;
+  // Get first name
+  static getFirstName() {
+    return userSettings.firstName;
   }
 
-  // Get user initials
+  // Get last name
+  static getLastName() {
+    return userSettings.lastName;
+  }
+
+  // Get full name
+  static getFullName() {
+    return `${userSettings.firstName} ${userSettings.lastName}`.trim();
+  }
+
+  // Get user initials (auto-generated)
   static getUserInitials() {
-    return userSettings.userInitials;
+    const first = userSettings.firstName[0] || "";
+    const last = userSettings.lastName[0] || "";
+    return (first + last).toUpperCase();
   }
 
   // Get all user settings
@@ -23,23 +35,22 @@ class SettingsService {
     return { ...userSettings };
   }
 
-  // Update user name
-  static setUserName(name) {
-    userSettings.userName = name;
-    // Auto-generate initials from name
-    const initials = name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-    userSettings.userInitials = initials;
+  // Update first name
+  static setFirstName(firstName) {
+    userSettings.firstName = firstName;
     this.notifyListeners();
   }
 
-  // Update user initials manually
-  static setUserInitials(initials) {
-    userSettings.userInitials = initials.toUpperCase().slice(0, 2);
+  // Update last name
+  static setLastName(lastName) {
+    userSettings.lastName = lastName;
+    this.notifyListeners();
+  }
+
+  // Update both names
+  static setNames(firstName, lastName) {
+    userSettings.firstName = firstName;
+    userSettings.lastName = lastName;
     this.notifyListeners();
   }
 

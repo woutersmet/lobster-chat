@@ -5,14 +5,14 @@ import SettingsService from "../services/SettingsService";
 import ChatInput from "../components/ChatInput";
 
 export default function HomeScreen() {
-  const [userName, setUserName] = useState(SettingsService.getUserName());
+  const [userName, setUserName] = useState(SettingsService.getFullName());
   const [inputText, setInputText] = useState("");
   const navigation = useNavigation();
 
   // Subscribe to settings changes
   useEffect(() => {
-    const unsubscribe = SettingsService.subscribe((settings) => {
-      setUserName(settings.userName);
+    const unsubscribe = SettingsService.subscribe(() => {
+      setUserName(SettingsService.getFullName());
     });
     return unsubscribe;
   }, []);
@@ -31,6 +31,7 @@ export default function HomeScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={90}
     >
       <View style={styles.content}>
         <Text style={styles.welcomeText}>Welcome, {userName}</Text>
