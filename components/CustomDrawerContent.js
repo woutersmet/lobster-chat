@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,28 @@ import {
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import ChatService from "../services/ChatService";
+import SettingsService from "../services/SettingsService";
 
 export default function CustomDrawerContent(props) {
   const { navigation } = props;
 
   // Get conversations from ChatService
   const conversations = ChatService.getAllSessions();
+
+  // Get user settings
+  const [userName, setUserName] = useState(SettingsService.getUserName());
+  const [userInitials, setUserInitials] = useState(
+    SettingsService.getUserInitials()
+  );
+
+  // Subscribe to settings changes
+  useEffect(() => {
+    const unsubscribe = SettingsService.subscribe((settings) => {
+      setUserName(settings.userName);
+      setUserInitials(settings.userInitials);
+    });
+    return unsubscribe;
+  }, []);
 
   const navigateToConversation = (conversationId, title) => {
     navigation.navigate("Chat", { conversationId, title });
@@ -67,9 +83,9 @@ export default function CustomDrawerContent(props) {
         onPress={() => navigation.navigate("Settings")}
       >
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>WS</Text>
+          <Text style={styles.avatarText}>{userInitials}</Text>
         </View>
-        <Text style={styles.profileName}>Wouter Smet</Text>
+        <Text style={styles.profileName}>{userName}</Text>
         <Ionicons name="settings-outline" size={20} color="#999" />
       </TouchableOpacity>
     </View>
